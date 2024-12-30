@@ -610,7 +610,7 @@ func (init *MuraenaProxyInit) Spawn() *MuraenaProxy {
 		// If request matches the redirect list, redirect it without processing
 		if redirect := muraena.getHTTPRedirect(r); redirect != nil {
 			// Retrieve the http.ResponseWriter from the context
-			if rw, ok := r.Context().Value(0).(http.ResponseWriter); ok {
+			if rw, ok := r.Context().Value(responseWriterKey).(http.ResponseWriter); ok {
 				http.Redirect(rw, r, redirect.RedirectTo, redirect.HTTPStatusCode)
 			} else {
 				log.Error("Failed to retrieve the http.ResponseWriter from the context")
@@ -620,7 +620,7 @@ func (init *MuraenaProxyInit) Spawn() *MuraenaProxy {
 		}
 
 		if err = muraena.RequestProcessor(r); err != nil {
-			log.Error(err.Error())
+			log.Error("%s", err.Error())
 			return
 		}
 

@@ -19,6 +19,10 @@ import (
 	"time"
 )
 
+type contextKey string
+
+const responseWriterKey = contextKey("responseWriter")
+
 // ReverseProxy is an HTTP Handler that takes an incoming request and
 // sends it to another server, proxying the response back to the
 // client.
@@ -174,20 +178,17 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	ctx := req.Context()
-	if cn, ok := rw.(http.CloseNotifier); ok {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithCancel(ctx)
-		defer cancel()
-		notifyChan := cn.CloseNotify()
-		go func() {
-			select {
-			case <-notifyChan:
-				cancel()
-			case <-ctx.Done():
-			}
-		}()
-	}
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		select {
+		case <-req.Context().Done():
+			cancel()
+		case <-ctx.Done():
+		}
+	}()
 
+	ctx = context.WithValue(ctx, responseWriterKey, rw)
 	outreq := req.WithContext(ctx) // includes shallow copies of maps, but okay
 	if req.ContentLength == 0 {
 		outreq.Body = nil // Issue 16036: nil Body for http.Transport retries
