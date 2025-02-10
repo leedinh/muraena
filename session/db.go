@@ -3,6 +3,7 @@ package session
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/evilsocket/islazy/tui"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	host      = "127.0.0.1"
+	host      = os.Getenv("REDIS_URL")
 	port      = 6379
 	password  = ""
 	RedisPool *redis.Pool
