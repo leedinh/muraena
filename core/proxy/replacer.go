@@ -53,12 +53,11 @@ func (r *Replacer) Init(s session.Session) error {
 		r.Target = s.Config.Proxy.Target
 	}
 
-	err := r.Load()
-	if err != nil {
-		log.Debug("Error loading replacer: %s", err)
-		log.Debug("Creating a new replacer")
-	}
-
+	// err := r.Load()
+	// if err != nil {
+	// 	log.Debug("Error loading replacer: %s", err)
+	// 	log.Debug("Creating a new replacer")
+	// }
 	if r.Phishing == "" {
 		r.Phishing = s.Config.Proxy.Phishing
 	}
@@ -75,7 +74,7 @@ func (r *Replacer) Init(s session.Session) error {
 	r.SetExternalOrigins(s.Config.Origins.ExternalOrigins)
 	r.SetOrigins(s.Config.Origins.OriginsMapping)
 
-	if err = r.DomainMapping(); err != nil {
+	if err := r.DomainMapping(); err != nil {
 		return err
 	}
 
@@ -83,11 +82,10 @@ func (r *Replacer) Init(s session.Session) error {
 	r.MakeReplacements()
 
 	// Save the replacer
-	err = r.Save()
-	if err != nil {
-		return fmt.Errorf("error saving replacer: %s", err)
-	}
-
+	// err = r.Save()
+	// if err != nil {
+	// 	return fmt.Errorf("error saving replacer: %s", err)
+	// }
 	return nil
 }
 
