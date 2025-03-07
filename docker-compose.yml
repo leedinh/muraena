@@ -18,8 +18,9 @@ services:
       - muraena_net
 
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: muraena-redis
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -32,3 +33,4 @@ networks:
 
 volumes:
   redis_data:
+    driver: local
