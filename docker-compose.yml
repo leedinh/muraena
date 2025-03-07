@@ -10,7 +10,7 @@ services:
     volumes:
       - ./config:/app/config
       - ./static:/app/static
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./certificates:/app/certificates:ro
     environment:
       - TZ=UTC
     restart: unless-stopped

@@ -130,9 +130,9 @@ externalOrigins = ["github.com", "login.microsoft.com","account.live.com", "logi
 [tls]
     enable = true
     expand = false
-    certificate = "/etc/letsencrypt/live/gmeoo.site/fullchain.pem"
-    key = "/etc/letsencrypt/live/gmeoo.site/privkey.pem"
-    root = "/etc/letsencrypt/live/gmeoo.site/chain.pem"
+    certificate = "/app/certificates/gmeoo.site/fullchain.pem"
+    key = "/app/certificates/gmeoo.site/privkey.pem"
+    root = "/app/certificates/gmeoo.site/chain.pem"
     minVersion = "TLS1.2"
     insecureSkipVerify = true
     sessionTicketsDisabled = true
