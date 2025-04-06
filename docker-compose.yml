@@ -1,24 +1,27 @@
-version: '3.8'
+version: '3'
 
 services:
   muraena:
     build: .
     container_name: muraena
-    expose:
-      - "80"
-      - "443"
+    ports:
+      - "443:443"
     volumes:
       - ./config:/app/config
       - ./static:/app/static
-      - ./certificates:/app/certificates:ro
+      - ./log:/app/log
+      - ./certs:/app/certs
     environment:
       - TZ=UTC
+      - CONFIG_FILE=/app/config/local-ssl.toml
     restart: unless-stopped
     networks:
       - muraena_net
+    depends_on:
+      - redis
 
   redis:
-    image: redis:7-alpine
+    image: redis:alpine
     container_name: muraena-redis
     command: redis-server --appendonly yes
     volumes:

@@ -27,16 +27,23 @@ RUN apk add --no-cache ca-certificates tzdata
 COPY --from=builder /build/build/muraena .
 COPY --from=builder /build/config ./config
 COPY --from=builder /build/static ./static
+COPY start.sh .
+COPY debug-entrypoint.sh .
 
-# Create non-root user
+# Create non-root user and set up directories
 RUN adduser -D -h /app muraena && \
-    chown -R muraena:muraena /app
+    mkdir -p /app/certs && \
+    chown -R muraena:muraena /app && \
+    chmod +x start.sh && \
+    chmod +x debug-entrypoint.sh
 
 USER muraena
 
 # Expose ports
 EXPOSE 80 443
 
-# Set entrypoint
-ENTRYPOINT ["./muraena"]
-CMD ["-config", "config/config.toml"]
+# Set environment variable for config file path with default value
+ENV CONFIG_FILE=/app/config/local-ssl.toml
+
+# Use the start script
+ENTRYPOINT ["/app/start.sh"]
